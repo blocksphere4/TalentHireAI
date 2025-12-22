@@ -12045,9 +12045,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"retell-sdk@npm:^4.19.0":
-  version: 4.20.0
-  resolution: "retell-sdk@npm:4.20.0"
+"retell-sdk@npm:^4.66.0":
+  version: 4.66.0
+  resolution: "retell-sdk@npm:4.66.0"
   dependencies:
     "@types/node": "npm:^18.11.18"
     "@types/node-fetch": "npm:^2.6.4"
@@ -12056,7 +12056,7 @@ __metadata:
     form-data-encoder: "npm:1.7.2"
     formdata-node: "npm:^4.3.2"
     node-fetch: "npm:^2.6.7"
-  checksum: 10c0/c9a4cfc3ff92cbecc4e4c22383580df3999bfb9f979caef2dc8c2cd0b466fd8b72595824d46adb1a26fe5479bcc2d60e28e865f2aa32c1dc78a6191a8e7aa836
+  checksum: 10c0/e8f89ced56104f64ae4394e256846e38254d0fe5689331eb6241e379ca617dcab4a96bcdeff387a0dfe836044e7d92cb2018cbb5189ecd2754f1ac0113062fda
   languageName: node
   linkType: hard
 
@@ -13050,7 +13050,7 @@ __metadata:
     react-dropzone: "npm:^14.2.3"
     react-hook-form: "npm:^7.49.0"
     retell-client-js-sdk: "npm:^2.0.0"
-    retell-sdk: "npm:^4.19.0"
+    retell-sdk: "npm:^4.66.0"
     shadcn-ui: "npm:^0.4.1"
     sharp: "npm:^0.33.2"
     sonner: "npm:^1.4.41"

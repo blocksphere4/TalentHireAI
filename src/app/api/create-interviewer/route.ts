@@ -1,6 +1,6 @@
 import { logger } from "@/lib/logger";
 import { InterviewerService } from "@/services/interviewers.service";
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import Retell from "retell-sdk";
 import { INTERVIEWERS, RETELL_AGENT_GENERAL_PROMPT } from "@/lib/constants";
 
@@ -8,12 +8,12 @@ const retellClient = new Retell({
   apiKey: process.env.RETELL_API_KEY || "",
 });
 
-export async function GET(res: NextRequest) {
+export async function GET() {
   logger.info("create-interviewer request received");
 
   try {
     const newModel = await retellClient.llm.create({
-      model: "gpt-4o",
+      model: "gpt-5",
       general_prompt: RETELL_AGENT_GENERAL_PROMPT,
       general_tools: [
         {
