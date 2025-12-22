@@ -1,7 +1,5 @@
 "use client";
 
-import "../globals.css";
-import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/navbar";
 import Providers from "@/components/providers";
@@ -10,28 +8,7 @@ import { Toaster } from "sonner";
 import SideMenu from "@/components/sideMenu";
 import { usePathname } from "next/navigation";
 
-const inter = Inter({ subsets: ["latin"] });
-
-const metadata = {
-  title: "TalentHireAI",
-  description: " AI-powered Interviews",
-  openGraph: {
-    title: "TalentHireAI",
-    description: "AI-powered Interviews",
-    siteName: "TalentHireAI",
-    images: [
-      {
-        url: "/talenthaireai.png",
-        width: 800,
-        height: 600,
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-};
-
-export default function RootLayout({
+export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -39,15 +16,9 @@ export default function RootLayout({
   const pathname = usePathname();
 
   return (
-    <html lang="en">
-      <head>
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
-        <link rel="icon" href="/browser-client-icon.ico" />
-      </head>
-      <body
+    <>
+      <div
         className={cn(
-          inter.className,
           "antialiased overflow-hidden min-h-screen",
         )}
       >
@@ -79,7 +50,7 @@ export default function RootLayout({
             />
           </Providers>
         </ClerkProvider>
-      </body>
-    </html>
+      </div>
+    </>
   );
 }

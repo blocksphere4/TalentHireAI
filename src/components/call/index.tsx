@@ -426,11 +426,14 @@ function Call({ interview }: InterviewProps) {
                         alt="Image of the interviewer"
                         width={120}
                         height={120}
-                        className={`object-cover object-center mx-auto my-auto ${
-                          activeTurn === "agent"
-                            ? `border-4 border-[${interview.theme_color}] rounded-full`
-                            : ""
+                        className={`object-cover object-center mx-auto my-auto rounded-full ${
+                          activeTurn === "agent" ? "border-4" : ""
                         }`}
+                        style={
+                          activeTurn === "agent"
+                            ? { borderColor: interview.theme_color }
+                            : undefined
+                        }
                       />
                       <div className="font-semibold">Interviewer</div>
                     </div>
@@ -450,11 +453,14 @@ function Call({ interview }: InterviewProps) {
                       alt="Picture of the user"
                       width={120}
                       height={120}
-                      className={`object-cover object-center mx-auto my-auto ${
-                        activeTurn === "user"
-                          ? `border-4 border-[${interview.theme_color}] rounded-full`
-                          : ""
+                      className={`object-cover object-center mx-auto my-auto rounded-full ${
+                        activeTurn === "user" ? "border-4" : ""
                       }`}
+                      style={
+                        activeTurn === "user"
+                          ? { borderColor: interview.theme_color }
+                          : undefined
+                      }
                     />
                     <div className="font-semibold">You</div>
                   </div>
