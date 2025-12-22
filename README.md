@@ -1,7 +1,3 @@
-[![GitHub stars](https://img.shields.io/github/stars/TalentHireAI/TalentHireAI?style=social)](https://github.com/TalentHireAI/TalentHireAI/stargazers)
-![License](https://img.shields.io/github/license/talenthaireai/talenthaireai)
-[![Twitter Follow](https://img.shields.io/twitter/follow/SuveenE?style=social)](https://x.com/SuveenE)
-
 # TalentHireAI - AI-powered voice interviewer for hiring 💼
 
 TalentHireAI is an open source platform for companies to conduct AI powered hiring interviews with their candidates.
