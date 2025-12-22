@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useOrganization } from "@clerk/nextjs";
 import { useInterviews } from "@/contexts/interviews.context";
 import { Share2, Filter, Pencil, UserIcon, Eye, Palette } from "lucide-react";
@@ -38,18 +38,20 @@ import { CandidateStatus } from "@/lib/enum";
 import LoaderWithText from "@/components/loaders/loader-with-text/loaderWithText";
 
 interface Props {
-  params: {
+  params: Promise<{
     interviewId: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     call: string;
     edit: boolean;
-  };
+  }>;
 }
 
 const base_url = process.env.NEXT_PUBLIC_LIVE_URL;
 
 function InterviewHome({ params, searchParams }: Props) {
+  const unwrappedParams = use(params);
+  const unwrappedSearchParams = use(searchParams);
   const [interview, setInterview] = useState<Interview>();
   const [responses, setResponses] = useState<Response[]>();
   const { getInterviewById } = useInterviews();
@@ -66,6 +68,11 @@ function InterviewHome({ params, searchParams }: Props) {
   const [iconColor, seticonColor] = useState<string>("#4F46E5");
   const { organization } = useOrganization();
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const seeInterviewPreviewPage = () => {
     const protocol = base_url?.includes("localhost") ? "http" : "https";
@@ -84,7 +91,7 @@ function InterviewHome({ params, searchParams }: Props) {
   useEffect(() => {
     const fetchInterview = async () => {
       try {
-        const response = await getInterviewById(params.interviewId);
+        const response = await getInterviewById(unwrappedParams.interviewId);
         setInterview(response);
         setIsActive(response.is_active);
         setIsViewed(response.is_viewed);
@@ -102,7 +109,7 @@ function InterviewHome({ params, searchParams }: Props) {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getInterviewById, params.interviewId, isGeneratingInsights]);
+  }, [getInterviewById, unwrappedParams.interviewId, isGeneratingInsights]);
 
   useEffect(() => {
     const fetchOrganizationData = async () => {
@@ -124,7 +131,7 @@ function InterviewHome({ params, searchParams }: Props) {
     const fetchResponses = async () => {
       try {
         const response = await ResponseService.getAllResponses(
-          params.interviewId,
+          unwrappedParams.interviewId,
         );
         setResponses(response);
         setLoading(true);
@@ -144,8 +151,8 @@ function InterviewHome({ params, searchParams }: Props) {
       setResponses(
         responses.filter((response) => response.call_id !== deletedCallId),
       );
-      if (searchParams.call === deletedCallId) {
-        router.push(`/interviews/${params.interviewId}`);
+      if (unwrappedSearchParams.call === deletedCallId) {
+        router.push(`/interviews/${unwrappedParams.interviewId}`);
       }
     }
   };
@@ -172,7 +179,7 @@ function InterviewHome({ params, searchParams }: Props) {
 
       await InterviewService.updateInterview(
         { is_active: updatedIsActive },
-        params.interviewId,
+        unwrappedParams.interviewId,
       );
 
       toast.success("Interview status updated", {
@@ -195,7 +202,7 @@ function InterviewHome({ params, searchParams }: Props) {
     try {
       await InterviewService.updateInterview(
         { theme_color: newColor },
-        params.interviewId,
+        unwrappedParams.interviewId,
       );
 
       toast.success("Theme color updated", {
@@ -355,7 +362,7 @@ function InterviewHome({ params, searchParams }: Props) {
                     className="bg-transparent shadow-none text-xs text-indigo-600 px-0 h-7 hover:scale-110 relative"
                     onClick={(event) => {
                       router.push(
-                        `/interviews/${params.interviewId}?edit=true`,
+                        `/interviews/${unwrappedParams.interviewId}?edit=true`,
                       );
                     }}
                   >
@@ -454,14 +461,14 @@ function InterviewHome({ params, searchParams }: Props) {
                   filterResponses().map((response) => (
                     <div
                       className={`p-2 rounded-md hover:bg-indigo-100 border-2 my-1 text-left text-xs ${
-                        searchParams.call == response.call_id
+                        unwrappedSearchParams.call == response.call_id
                           ? "bg-indigo-200"
                           : "border-indigo-100"
                       } flex flex-row justify-between cursor-pointer w-full`}
                       key={response?.id}
                       onClick={() => {
                         router.push(
-                          `/interviews/${params.interviewId}?call=${response.call_id}`,
+                          `/interviews/${unwrappedParams.interviewId}?call=${response.call_id}`,
                         );
                         handleResponseClick(response);
                       }}
@@ -541,13 +548,13 @@ function InterviewHome({ params, searchParams }: Props) {
             </div>
             {responses && (
               <div className="w-[85%] rounded-md ">
-                {searchParams.call ? (
+                {unwrappedSearchParams.call ? (
                   <CallInfo
-                    call_id={searchParams.call}
+                    call_id={unwrappedSearchParams.call}
                     onDeleteResponse={handleDeleteResponse}
                     onCandidateStatusChange={handleCandidateStatusChange}
                   />
-                ) : searchParams.edit ? (
+                ) : unwrappedSearchParams.edit ? (
                   <EditInterview interview={interview} />
                 ) : (
                   <SummaryInfo responses={responses} interview={interview} />
@@ -566,16 +573,18 @@ function InterviewHome({ params, searchParams }: Props) {
           <h3 className="text-lg font-semibold mb-4 text-center">
             Choose a Theme Color
           </h3>
-          <ChromePicker
-            disableAlpha={true}
-            color={themeColor}
-            styles={{
-              default: {
-                picker: { width: "100%" },
-              },
-            }}
-            onChange={handleColorChange}
-          />
+          {isMounted && (
+            <ChromePicker
+              disableAlpha={true}
+              color={themeColor}
+              styles={{
+                default: {
+                  picker: { width: "100%" },
+                },
+              }}
+              onChange={handleColorChange}
+            />
+          )}
         </div>
       </Modal>
       {isSharePopupOpen && (

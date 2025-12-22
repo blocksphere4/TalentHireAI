@@ -382,7 +382,7 @@ function Call({ interview }: InterviewProps) {
                     {!Loading ? "Start Interview" : <MiniLoader />}
                   </Button>
                   <AlertDialog>
-                    <AlertDialogTrigger>
+                    <AlertDialogTrigger asChild>
                       <Button
                         className="bg-white border ml-2 text-black min-w-15 h-10 rounded-lg flex flex-row justify-center mb-8"
                         style={{ borderColor: interview.theme_color }}
@@ -421,21 +421,37 @@ function Call({ interview }: InterviewProps) {
                       {lastInterviewerResponse}
                     </div>
                     <div className="flex flex-col mx-auto justify-center items-center align-middle">
-                      <Image
-                        src={interviewerImg}
-                        alt="Image of the interviewer"
-                        width={120}
-                        height={120}
-                        className={`object-cover object-center mx-auto my-auto rounded-full ${
-                          activeTurn === "agent" ? "border-4" : ""
+                      <div
+                        className={`relative p-2 rounded-full transition-all duration-300 ${
+                          activeTurn === "agent"
+                            ? "bg-opacity-20 scale-105 animate-pulse"
+                            : "bg-transparent"
                         }`}
                         style={
                           activeTurn === "agent"
-                            ? { borderColor: interview.theme_color }
+                            ? {
+                                backgroundColor: `${interview.theme_color}20`,
+                                boxShadow: `0 0 30px ${interview.theme_color}80, 0 0 60px ${interview.theme_color}40`,
+                              }
                             : undefined
                         }
-                      />
-                      <div className="font-semibold">Interviewer</div>
+                      >
+                        <Image
+                          src={interviewerImg}
+                          alt="Image of the interviewer"
+                          width={120}
+                          height={120}
+                          className={`object-cover object-center mx-auto my-auto rounded-full transition-all duration-300 ${
+                            activeTurn === "agent" ? "border-4" : ""
+                          }`}
+                          style={
+                            activeTurn === "agent"
+                              ? { borderColor: interview.theme_color }
+                              : undefined
+                          }
+                        />
+                      </div>
+                      <div className="font-semibold mt-2">Interviewer</div>
                     </div>
                   </div>
                 </div>
@@ -448,35 +464,51 @@ function Call({ interview }: InterviewProps) {
                     {lastUserResponse}
                   </div>
                   <div className="flex flex-col mx-auto justify-center items-center align-middle">
-                    <Image
-                      src={`/user-icon.png`}
-                      alt="Picture of the user"
-                      width={120}
-                      height={120}
-                      className={`object-cover object-center mx-auto my-auto rounded-full ${
-                        activeTurn === "user" ? "border-4" : ""
+                    <div
+                      className={`relative p-2 rounded-full transition-all duration-300 ${
+                        activeTurn === "user"
+                          ? "bg-opacity-20 scale-105 animate-pulse"
+                          : "bg-transparent"
                       }`}
                       style={
                         activeTurn === "user"
-                          ? { borderColor: interview.theme_color }
+                          ? {
+                              backgroundColor: `${interview.theme_color}20`,
+                              boxShadow: `0 0 30px ${interview.theme_color}80, 0 0 60px ${interview.theme_color}40`,
+                            }
                           : undefined
                       }
-                    />
-                    <div className="font-semibold">You</div>
+                    >
+                      <Image
+                        src={`/user-icon.png`}
+                        alt="Picture of the user"
+                        width={120}
+                        height={120}
+                        className={`object-cover object-center mx-auto my-auto rounded-full transition-all duration-300 ${
+                          activeTurn === "user" ? "border-4" : ""
+                        }`}
+                        style={
+                          activeTurn === "user"
+                            ? { borderColor: interview.theme_color }
+                            : undefined
+                        }
+                      />
+                    </div>
+                    <div className="font-semibold mt-2">You</div>
                   </div>
                 </div>
               </div>
             )}
             {isStarted && !isEnded && !isOldUser && (
-              <div className="items-center p-2">
+              <div className="items-center p-2 flex justify-center">
                 <AlertDialog>
-                  <AlertDialogTrigger className="w-full">
+                  <AlertDialogTrigger asChild>
                     <Button
-                      className=" bg-white text-black border  border-indigo-600 h-10 mx-auto flex flex-row justify-center mb-8"
+                      className="bg-red-600 text-white border border-red-700 h-10 w-48 flex flex-row justify-center mb-8 hover:bg-red-700"
                       disabled={Loading}
                     >
                       End Interview{" "}
-                      <XCircleIcon className="h-[1.5rem] ml-2 w-[1.5rem] rotate-0 scale-100  dark:-rotate-90 dark:scale-0 text-red" />
+                      <XCircleIcon className="h-[1.5rem] ml-2 w-[1.5rem] rotate-0 scale-100  dark:-rotate-90 dark:scale-0 text-white" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -524,7 +556,7 @@ function Call({ interview }: InterviewProps) {
                       open={isDialogOpen}
                       onOpenChange={setIsDialogOpen}
                     >
-                      <AlertDialogTrigger className="w-full flex justify-center">
+                      <AlertDialogTrigger asChild className="w-full flex justify-center">
                         <Button
                           className="bg-indigo-600 text-white h-10 mt-4 mb-4"
                           onClick={() => setIsDialogOpen(true)}
@@ -533,6 +565,9 @@ function Call({ interview }: InterviewProps) {
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Provide Feedback</AlertDialogTitle>
+                        </AlertDialogHeader>
                         <FeedbackForm
                           email={email}
                           onSubmit={handleFeedbackSubmit}

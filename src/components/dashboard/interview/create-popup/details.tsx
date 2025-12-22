@@ -13,6 +13,7 @@ import FileUpload from "../fileUpload";
 import Modal from "@/components/dashboard/Modal";
 import InterviewerDetailsModal from "@/components/dashboard/interviewer/interviewerDetailsModal";
 import { Interviewer } from "@/types/interviewer";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
@@ -55,6 +56,7 @@ function DetailsPopup({
   );
   const [duration, setDuration] = useState(interviewData.time_duration);
   const [uploadedDocumentContext, setUploadedDocumentContext] = useState("");
+  const [selectedModel, setSelectedModel] = useState<"openai" | "gemini">("gemini");
 
   const slideLeft = (id: string, value: number) => {
     var slider = document.getElementById(`${id}`);
@@ -78,37 +80,68 @@ function DetailsPopup({
       objective: objective.trim(),
       number: numQuestions,
       context: uploadedDocumentContext,
+      model: selectedModel,
     };
 
-    const generatedQuestions = (await axios.post(
-      "/api/generate-interview-questions",
-      data,
-    )) as any;
+    try {
+      const generatedQuestions = (await axios.post(
+        "/api/generate-interview-questions",
+        data,
+      )) as any;
 
-    const generatedQuestionsResponse = JSON.parse(
-      generatedQuestions?.data?.response,
-    );
+      const generatedQuestionsResponse = JSON.parse(
+        generatedQuestions?.data?.response,
+      );
 
-    const updatedQuestions = generatedQuestionsResponse.questions.map(
-      (question: Question) => ({
-        id: uuidv4(),
-        question: question.question.trim(),
-        follow_up_count: 1,
-      }),
-    );
+      const updatedQuestions = generatedQuestionsResponse.questions.map(
+        (question: Question) => ({
+          id: uuidv4(),
+          question: question.question.trim(),
+          follow_up_count: 1,
+        }),
+      );
 
-    const updatedInterviewData = {
-      ...interviewData,
-      name: name.trim(),
-      objective: objective.trim(),
-      questions: updatedQuestions,
-      interviewer_id: selectedInterviewer,
-      question_count: Number(numQuestions),
-      time_duration: duration,
-      description: generatedQuestionsResponse.description,
-      is_anonymous: isAnonymous,
-    };
-    setInterviewData(updatedInterviewData);
+      const updatedInterviewData = {
+        ...interviewData,
+        name: name.trim(),
+        objective: objective.trim(),
+        questions: updatedQuestions,
+        interviewer_id: selectedInterviewer,
+        question_count: Number(numQuestions),
+        time_duration: duration,
+        description: generatedQuestionsResponse.description,
+        is_anonymous: isAnonymous,
+      };
+      setInterviewData(updatedInterviewData);
+
+      // Show success message
+      const provider = generatedQuestions?.data?.provider;
+      if (provider === "gemini") {
+        toast.success("Questions generated successfully!", {
+          description: "Generated using Google Gemini Flash (FREE)",
+        });
+      } else {
+        toast.success("Questions generated successfully!", {
+          description: "Generated using OpenAI GPT-4o",
+        });
+      }
+    } catch (error: any) {
+      setLoading(false);
+      setIsClicked(false);
+
+      const errorMessage = error.response?.data?.message ||
+                          error.response?.data?.details ||
+                          "Failed to generate questions. Please try again.";
+
+      toast.error(errorMessage, {
+        duration: 5000,
+        description: error.response?.data?.details ?
+          "Tip: You can add GOOGLE_API_KEY to your .env file for free Gemini API access." :
+          undefined,
+      });
+
+      console.error("Error generating questions:", error);
+    }
   };
 
   const onManual = () => {
@@ -137,6 +170,7 @@ function DetailsPopup({
       setNumQuestions("");
       setDuration("");
       setIsClicked(false);
+      setSelectedModel("gemini");
     }
   }, [open]);
 
@@ -234,6 +268,39 @@ function DetailsPopup({
             setFileName={setFileName}
             setUploadedDocumentContext={setUploadedDocumentContext}
           />
+          <h3 className="text-sm font-medium mt-4">Select AI Model:</h3>
+          <div className="flex gap-4 mt-2 w-full">
+            <button
+              type="button"
+              onClick={() => setSelectedModel("gemini")}
+              className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
+                selectedModel === "gemini"
+                  ? "border-indigo-600 bg-indigo-50"
+                  : "border-gray-300 hover:border-indigo-400"
+              }`}
+            >
+              <div className="flex flex-col items-center">
+                <span className="font-semibold text-sm">Google Gemini Flash</span>
+                <span className="text-xs text-green-600 font-medium mt-1">FREE</span>
+                <span className="text-xs text-gray-500 mt-0.5">Fast & Reliable</span>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedModel("openai")}
+              className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
+                selectedModel === "openai"
+                  ? "border-indigo-600 bg-indigo-50"
+                  : "border-gray-300 hover:border-indigo-400"
+              }`}
+            >
+              <div className="flex flex-col items-center">
+                <span className="font-semibold text-sm">OpenAI GPT-4o</span>
+                <span className="text-xs text-blue-600 font-medium mt-1">PAID</span>
+                <span className="text-xs text-gray-500 mt-0.5">Advanced Quality</span>
+              </div>
+            </button>
+          </div>
           <label className="flex-col mt-7 w-full">
             <div className="flex items-center cursor-pointer">
               <span className="text-sm font-medium">

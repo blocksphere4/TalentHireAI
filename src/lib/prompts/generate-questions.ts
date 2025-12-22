@@ -4,7 +4,7 @@ export const SYSTEM_PROMPT =
 export const generateQuestionsPrompt = (body: {
   name: string;
   objective: string;
-  number: number;
+  number: number | string;
   context: string;
 }) => `Imagine you are an interviewer specialized in designing interview questions to help hiring managers find candidates with strong technical expertise and project experience, making it easier to identify the ideal fit for the role.
               
