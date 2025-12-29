@@ -82,3 +82,57 @@ CREATE TABLE feedback (
     feedback TEXT,
     satisfaction INTEGER
 );
+
+CREATE TABLE job (
+    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    organization_id TEXT REFERENCES organization(id) NOT NULL,
+    user_id TEXT REFERENCES "user"(id) NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    location_type TEXT NOT NULL,
+    location_details TEXT,
+    employment_type TEXT NOT NULL,
+    skills JSONB NOT NULL,
+    experience TEXT NOT NULL,
+    qualifications JSONB NOT NULL,
+    salary_min INTEGER,
+    salary_max INTEGER,
+    salary_currency TEXT DEFAULT 'USD',
+    benefits JSONB,
+    deadline TIMESTAMP WITH TIME ZONE,
+    start_date TIMESTAMP WITH TIME ZONE,
+    openings INTEGER NOT NULL DEFAULT 1,
+    is_active BOOLEAN DEFAULT true,
+    is_archived BOOLEAN DEFAULT false,
+    application_count INTEGER DEFAULT 0
+);
+
+CREATE TABLE job_application (
+    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    job_id TEXT REFERENCES job(id) ON DELETE CASCADE NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    resume_url TEXT NOT NULL,
+    resume_text TEXT,
+    cover_letter TEXT,
+    ats_analysis JSONB,
+    ats_score INTEGER,
+    status TEXT DEFAULT 'new',
+    is_viewed BOOLEAN DEFAULT false,
+    interview_id TEXT REFERENCES interview(id),
+    source TEXT DEFAULT 'careers_page'
+);
+
+-- Indexes for performance
+CREATE INDEX idx_job_organization ON job(organization_id);
+CREATE INDEX idx_job_active ON job(is_active, is_archived);
+CREATE INDEX idx_job_deadline ON job(deadline);
+CREATE INDEX idx_application_job ON job_application(job_id);
+CREATE INDEX idx_application_status ON job_application(status);
+CREATE INDEX idx_application_ats_score ON job_application(ats_score DESC);
+CREATE INDEX idx_application_email ON job_application(email);
